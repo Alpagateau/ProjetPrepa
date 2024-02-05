@@ -35,6 +35,7 @@ def funct(L):
                 ad = L.copy()
                 removeValues(i, j, ad)
                 ad += [n]
+                ad.sort()
                 if n not in M:
                     M += [n]
                 funct(ad)
@@ -48,6 +49,7 @@ def funct(L):
                     mu = L.copy()
                     removeValues(i,j,mu)
                     mu += [n]
+                    mu.sort()
                     if n not in M:
                         M += [n]
                     funct(mu)
@@ -64,6 +66,7 @@ def funct(L):
                 su = L.copy()
                 removeValues(i,j,su)
                 su += [n]
+                su.sort()
                 if n not in M:
                     M += [n]
                 funct(su)
@@ -76,9 +79,10 @@ def funct(L):
                 continue
             if L[i] % L[j] == 0:
                 di = L.copy()
-                n = di[i] / di[j]
+                n = di[i] // di[j]
                 removeValues(i , j, di)
                 di += [n]
+                di.sort()
                 if n not in M:
                     M += [n]
                 funct(di)
