@@ -2,9 +2,16 @@ import sys
 import numpy as np
 import matplotlib.pyplot as plt
 import time
+import operationTester as ot
+
+import treeVisualizer as tv
 
 M = []
 explored = []
+higherNode = 0
+
+#node struct (value, parent ID)
+tree = []
 
 MAX = 999
 
@@ -17,42 +24,45 @@ def removeValues(i, j, L):
         L.pop(j)
     return L
 
-def funct(L):
-    global M, explored, MAX
+def funct(L, parentNode = 0, verbose = False):
+    global M, explored, MAX, tree, higherNode
     if len(L) < 2:
         return
     if L in explored:
-        print(L, " ", end="")
+        if verbose:
+            print(L, " ", end="")
         return
+    nodeID = higherNode
+    tree += [(nodeID ,L.copy(), parentNode)]
+    higherNode += 1
+
     #half search + *
     for i in range(len(L)):
         for j in range(i+1,len(L)):
-            if i == j:
-                j+=1
             #addition
             n = L[i] + L[j]
-            if n < MAX:
+            if n <= MAX:
                 ad = L.copy()
                 removeValues(i, j, ad)
                 ad += [n]
                 ad.sort()
                 if n not in M:
                     M += [n]
-                funct(ad)
+                funct(ad,nodeID)
                 if len(ad)>1:
                     explored += [ad]
 
             #multiplication
             if not L[i] == 1 and not L[j] == 1:
                 n = L[i] * L[j]
-                if n < MAX:
+                if n <= MAX:
                     mu = L.copy()
                     removeValues(i,j,mu)
                     mu += [n]
                     mu.sort()
                     if n not in M:
                         M += [n]
-                    funct(mu)
+                    funct(mu, nodeID)
                     if len(mu)>1:
                         explored += [mu]
     #full search - /
@@ -62,14 +72,14 @@ def funct(L):
                 j+=1
             #substraction
             n = L[i] - L[j]
-            if n > 0:
+            if n >= 0:
                 su = L.copy()
                 removeValues(i,j,su)
                 su += [n]
                 su.sort()
                 if n not in M:
                     M += [n]
-                funct(su)
+                funct(su, nodeID)
                 explored += [su]
             
             #division
@@ -85,34 +95,20 @@ def funct(L):
                 di.sort()
                 if n not in M:
                     M += [n]
-                funct(di)
+                funct(di, nodeID)
                 explored += [di]
 
 t = time.time()
-#7.788s 990
-#funct([2,3,4,5,5,6])
-funct([1,2,3,4,5,6,7])
+#2.228s 990
+funct([2,3,4,5,6,7])
+#funct([1,2,3,4,5,6,7])
 M.sort()
 print("")
-print(M)
 print("took ", time.time() - t, " seconds")
 
-"""
-v = []
-n = 7
-for i in range(n):
-    L = (np.arange(i+1)*2).tolist()
-    M = [] + L
-    for j in range(n):
-        if j < i:
-            print("##", end="")
-        else:
-            print("--", end='')
-    print('')
-    funct(L)
-    v += [len(M)]
-print(v)
-plt.plot(v)
-plt.show()
-"""
+#print(tree)
+
+tv.populate(tree)
+tv.start()
+#ot.showV(M)
 #environs 1/2 * exp(x)
